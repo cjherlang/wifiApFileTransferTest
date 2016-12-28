@@ -29,7 +29,7 @@ import io.github.mayubao.kuaichuan.core.FileReceiver;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.entity.IpPortInfo;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
-import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
+import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.ToastUtils;
 import io.github.mayubao.kuaichuan.ui.adapter.FileReceiverAdapter;
 

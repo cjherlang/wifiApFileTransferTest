@@ -1,4 +1,4 @@
-package io.github.mayubao.kuaichuan.core.utils;
+package io.github.mayubao.kuaichuan.core;
 
 import android.content.Context;
 import android.net.DhcpInfo;

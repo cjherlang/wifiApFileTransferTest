@@ -25,7 +25,7 @@ import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.FileSender;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
-import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
+import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.ui.adapter.FileSenderAdapter;
 
 /**

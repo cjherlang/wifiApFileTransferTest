@@ -23,7 +23,7 @@ import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.receiver.WifiAPBroadcastReceiver;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
-import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
+import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.TextUtils;
 import io.github.mayubao.kuaichuan.micro_server.AndroidMicroServer;
 import io.github.mayubao.kuaichuan.micro_server.DownloadResUriHandler;

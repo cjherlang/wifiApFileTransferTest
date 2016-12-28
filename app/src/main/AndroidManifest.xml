@@ -27,18 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
-        <activity
-            android:name=".ui.ClientActivity"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".ui.ServerActivity"
-            android:theme="@style/AppTheme" />
 
         <!-- 选择文件UI -->
         <activity

@@ -22,7 +22,7 @@ import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.entity.IpPortInfo;
 import io.github.mayubao.kuaichuan.core.receiver.WifiAPBroadcastReceiver;
-import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
+import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.TextUtils;
 import io.github.mayubao.kuaichuan.ui.view.RadarLayout;
 import io.github.mayubao.kuaichuan.utils.NavigatorUtils;
