@@ -22,10 +22,9 @@ import io.github.mayubao.kuaichuan.R;
 import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.receiver.WifiAPBroadcastReceiver;
-import io.github.mayubao.kuaichuan.core.utils.ApMgr;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
+import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.TextUtils;
-import io.github.mayubao.kuaichuan.core.utils.WifiMgr;
 import io.github.mayubao.kuaichuan.micro_server.AndroidMicroServer;
 import io.github.mayubao.kuaichuan.micro_server.DownloadResUriHandler;
 import io.github.mayubao.kuaichuan.micro_server.IOStreamUtils;
@@ -86,7 +85,7 @@ public class WebTransferActivity extends BaseActivity {
         closeServer();
 
         //关闭热点
-        ApMgr.disableAp(getContext());
+        MyWifiManager.getInstance(getContext()).disableAp();
 
         //清楚所选中的文件
         AppContext.getAppContext().getFileInfoMap().clear();
@@ -118,19 +117,11 @@ public class WebTransferActivity extends BaseActivity {
     private void init(){
         initUI();
 
-        //1.初始化热点
-        WifiMgr.getInstance(getContext()).disableWifi();
-        if(ApMgr.isApOn(getContext())){
-            ApMgr.disableAp(getContext());
-        }
-
         mWifiAPBroadcastReceiver = new WifiAPBroadcastReceiver() {
             @Override
             public void onWifiApEnabled() {
                 Log.i(TAG, "======>>>onWifiApEnabled !!!");
                 if(!mIsInitialized){
-//                    mUdpServerRuannable = createSendMsgToFileSenderRunnable();
-//                    AppContext.MAIN_EXECUTOR.execute(mUdpServerRuannable);
                     try {
                         AppContext.MAIN_EXECUTOR.execute(createServer());
                         mIsInitialized = true;
@@ -144,12 +135,8 @@ public class WebTransferActivity extends BaseActivity {
         IntentFilter filter = new IntentFilter(WifiAPBroadcastReceiver.ACTION_WIFI_AP_STATE_CHANGED);
         registerReceiver(mWifiAPBroadcastReceiver, filter);
 
-        ApMgr.isApOn(getContext()); // check Ap state :boolean
         String ssid = TextUtils.isNullOrBlank(android.os.Build.DEVICE) ? Constant.DEFAULT_SSID : android.os.Build.DEVICE;
-        ApMgr.configApState(getContext(), ssid); // change Ap state :boolean
-
-
-//        tv_tip_1.setText(getResources().getString(R.string.tip_web_transfer_first_tip).replace("{hotspot}", ssid));
+        MyWifiManager.getInstance(getContext()).enableAp(ssid); // change Ap state :boolean
     }
 
     /**
@@ -217,11 +204,11 @@ public class WebTransferActivity extends BaseActivity {
             public void run() {
                 try{
                     // 确保热点开启之后获取得到IP地址
-                    String hotspotIpAddr = WifiMgr.getInstance(getContext()).getHotspotLocalIpAddress();
+                    String hotspotIpAddr = MyWifiManager.getInstance(getContext()).getHotspotLocalIpAddress();
                     int count = 0;
                     while(hotspotIpAddr.equals(Constant.DEFAULT_UNKOWN_IP) && count < Constant.DEFAULT_TRY_TIME){
                         Thread.sleep(1000);
-                        hotspotIpAddr = WifiMgr.getInstance(getContext()).getIpAddressFromHotspot();
+                        hotspotIpAddr = MyWifiManager.getInstance(getContext()).getIpAddressFromHotspot();
                         Log.i(TAG, "receiver serverIp ----->>>" + hotspotIpAddr);
                         count ++;
                     }

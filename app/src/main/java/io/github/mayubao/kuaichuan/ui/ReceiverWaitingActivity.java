@@ -22,9 +22,8 @@ import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.entity.IpPortInfo;
 import io.github.mayubao.kuaichuan.core.receiver.WifiAPBroadcastReceiver;
-import io.github.mayubao.kuaichuan.core.utils.ApMgr;
+import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.TextUtils;
-import io.github.mayubao.kuaichuan.core.utils.WifiMgr;
 import io.github.mayubao.kuaichuan.ui.view.RadarLayout;
 import io.github.mayubao.kuaichuan.utils.NavigatorUtils;
 
@@ -94,7 +93,7 @@ public class ReceiverWaitingActivity extends BaseActivity {
         closeSocket();
 
         //关闭热点
-        ApMgr.disableAp(getContext());
+        MyWifiManager.getInstance(getContext()).disableAp();
 
         this.finish();
     }
@@ -123,12 +122,6 @@ public class ReceiverWaitingActivity extends BaseActivity {
         radarLayout.setCount(4);
         radarLayout.start();
 
-        //1.初始化热点
-        WifiMgr.getInstance(getContext()).disableWifi();
-        if(ApMgr.isApOn(getContext())){
-            ApMgr.disableAp(getContext());
-        }
-
         mWifiAPBroadcastReceiver = new WifiAPBroadcastReceiver() {
             @Override
             public void onWifiApEnabled() {
@@ -148,12 +141,11 @@ public class ReceiverWaitingActivity extends BaseActivity {
                 }
             }
         };
+
         IntentFilter filter = new IntentFilter(WifiAPBroadcastReceiver.ACTION_WIFI_AP_STATE_CHANGED);
         registerReceiver(mWifiAPBroadcastReceiver, filter);
-
-        ApMgr.isApOn(getContext()); // check Ap state :boolean
         String ssid = TextUtils.isNullOrBlank(android.os.Build.DEVICE) ? Constant.DEFAULT_SSID : android.os.Build.DEVICE;
-        ApMgr.configApState(getContext(), ssid); // change Ap state :boolean
+        MyWifiManager.getInstance(getContext()).enableAp(ssid); // enable ap
 
         tv_device_name.setText(ssid);
         tv_desc.setText(getResources().getString(R.string.tip_now_is_initial));
@@ -196,10 +188,10 @@ public class ReceiverWaitingActivity extends BaseActivity {
 
         //网络连接上，无法获取IP的问题
         int count = 0;
-        String localAddress = WifiMgr.getInstance(getContext()).getHotspotLocalIpAddress();
+        String localAddress = MyWifiManager.getInstance(getContext()).getHotspotLocalIpAddress();
         while(localAddress.equals(Constant.DEFAULT_UNKOWN_IP) && count <  Constant.DEFAULT_TRY_TIME){
             Thread.sleep(1000);
-            localAddress = WifiMgr.getInstance(getContext()).getHotspotLocalIpAddress();
+            localAddress = MyWifiManager.getInstance(getContext()).getHotspotLocalIpAddress();
             Log.i(TAG, "receiver get local Ip ----->>>" + localAddress);
             count ++;
         }

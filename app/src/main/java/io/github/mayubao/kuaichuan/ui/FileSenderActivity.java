@@ -25,7 +25,7 @@ import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.FileSender;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
-import io.github.mayubao.kuaichuan.core.utils.WifiMgr;
+import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
 import io.github.mayubao.kuaichuan.ui.adapter.FileSenderAdapter;
 
 /**
@@ -231,7 +231,7 @@ public class FileSenderActivity extends BaseActivity {
         List<Map.Entry<String, FileInfo>> fileInfoMapList = new ArrayList<Map.Entry<String, FileInfo>>(AppContext.getAppContext().getFileInfoMap().entrySet());
         Collections.sort(fileInfoMapList, Constant.DEFAULT_COMPARATOR);
 
-        String serverIp = WifiMgr.getInstance(getContext()).getIpAddressFromHotspot();
+        String serverIp = MyWifiManager.getInstance(getContext()).getIpAddressFromHotspot();
         for(Map.Entry<String, FileInfo> entry : fileInfoMapList){
             final FileInfo fileInfo = entry.getValue();
             FileSender fileSender = new FileSender(getContext(), fileInfo, serverIp, Constant.DEFAULT_SERVER_PORT);

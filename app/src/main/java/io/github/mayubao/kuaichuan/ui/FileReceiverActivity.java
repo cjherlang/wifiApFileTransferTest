@@ -28,8 +28,8 @@ import io.github.mayubao.kuaichuan.core.BaseTransfer;
 import io.github.mayubao.kuaichuan.core.FileReceiver;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.entity.IpPortInfo;
-import io.github.mayubao.kuaichuan.core.utils.ApMgr;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
+import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.ToastUtils;
 import io.github.mayubao.kuaichuan.ui.adapter.FileReceiverAdapter;
 
@@ -145,7 +145,7 @@ public class FileReceiverActivity extends BaseActivity {
 
         AppContext.getAppContext().getReceiverFileInfoMap().clear();
 
-        ApMgr.disableAp(getContext());
+        MyWifiManager.getInstance(getContext()).disableAp();
         this.finish();
     }
 

@@ -30,8 +30,8 @@ import io.github.mayubao.kuaichuan.core.FileSender;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.receiver.WifiBroadcastReceiver;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
+import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.ToastUtils;
-import io.github.mayubao.kuaichuan.core.utils.WifiMgr;
 
 /**
  * Created by mayubao on 2016/11/28.
@@ -141,7 +141,7 @@ public class ClientActivity extends BaseActivity {
 
                 //生成缩略图
                 FileInfo fileInfo = mFileInfoList.get(index);
-                String hotspotIpAddress = WifiMgr.getInstance(mContext).getIpAddressFromHotspot();
+                String hotspotIpAddress = MyWifiManager.getInstance(mContext).getIpAddressFromHotspot();
                 final FileSender fileSender = new FileSender(mContext,fileInfo, hotspotIpAddress, DEFAULT_PORT);
                 fileSender.setOnSendListener(new FileSender.OnSendListener() {
                     @Override
@@ -179,7 +179,7 @@ public class ClientActivity extends BaseActivity {
             @Override
             public void onWifiEnabled() {
                 Log.i(TAG, "onWifiEnabled------>>>");
-//                String hotspotIpAddress = WifiMgr.getInstance(mContext).getIpAddressFromHotspot();
+//                String hotspotIpAddress = MyWifiManager.getInstance(mContext).getIpAddressFromHotspot();
 //                mCommunicateRunnable = new CommunicateRunnable(hotspotIpAddress, DEFAULT_PORT);
 //                new Thread(mCommunicateRunnable).start();
             }
@@ -187,11 +187,11 @@ public class ClientActivity extends BaseActivity {
         IntentFilter filter = new IntentFilter(WifiBroadcastReceiver.ACTION_WIFI_STATE_CHANGED);
         registerReceiver(mWifiBroadcastReceiver, filter);
 
-        WifiMgr.getInstance(mContext).openWifi();
-        WifiMgr.getInstance(mContext).addNetwork(WifiMgr.createWifiCfg(DEFAULT_SSID, null, WifiMgr.WIFICIPHER_NOPASS));
+        MyWifiManager.getInstance(mContext).openWifi();
+        MyWifiManager.getInstance(mContext).addNetwork(MyWifiManager.createWifiCfg(DEFAULT_SSID, null, MyWifiManager.WIFICIPHER_NOPASS));
 
         /**
-        String hotspotIpAddress = WifiMgr.getInstance(mContext).getIpAddressFromHotspot();
+        String hotspotIpAddress = MyWifiManager.getInstance(mContext).getIpAddressFromHotspot();
         //如果未连接上Wifi网络是无法获取IP的
 //        ToastUtils.show(mContext, "获取hotspotIpAddress--->>>" + hotspotIpAddress );
         new Thread(new CommunicateRunnable(hotspotIpAddress, DEFAULT_PORT)).start();

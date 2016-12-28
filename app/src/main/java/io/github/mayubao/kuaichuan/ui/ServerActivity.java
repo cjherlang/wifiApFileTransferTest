@@ -29,8 +29,7 @@ import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.FileReceiver;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.receiver.WifiAPBroadcastReceiver;
-import io.github.mayubao.kuaichuan.core.utils.ApMgr;
-import io.github.mayubao.kuaichuan.core.utils.WifiMgr;
+import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
 
 /**
  * Created by mayubao on 2016/11/28.
@@ -114,13 +113,6 @@ public class ServerActivity extends BaseActivity {
         btn_suspend.setOnClickListener(listener);
         btn_resume.setOnClickListener(listener);
 
-
-        WifiMgr.getInstance(mContext).disableWifi();
-//        new Thread(new ServerRunnable(DEFAULT_PORT)).start();
-        if(ApMgr.isApOn(mContext)){
-            ApMgr.disableAp(mContext);
-        }
-
         mWifiAPBroadcastReceiver = new WifiAPBroadcastReceiver() {
             @Override
             public void onWifiApEnabled() {
@@ -131,9 +123,7 @@ public class ServerActivity extends BaseActivity {
         IntentFilter filter = new IntentFilter(WifiAPBroadcastReceiver.ACTION_WIFI_AP_STATE_CHANGED);
         registerReceiver(mWifiAPBroadcastReceiver, filter);
 
-
-        ApMgr.isApOn(mContext); // check Ap state :boolean
-        ApMgr.configApState(mContext, DEFAULT_SSID); // change Ap state :boolean
+        MyWifiManager.getInstance(getContext()).enableAp(DEFAULT_SSID); // change Ap state :boolean
     }
 
     View.OnClickListener mOnClickListener = new View.OnClickListener() {

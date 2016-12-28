@@ -28,8 +28,8 @@ import io.github.mayubao.kuaichuan.R;
 import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.BaseTransfer;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
+import io.github.mayubao.kuaichuan.core.utils.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.ToastUtils;
-import io.github.mayubao.kuaichuan.core.utils.WifiMgr;
 import io.github.mayubao.kuaichuan.ui.adapter.WifiScanResultAdapter;
 import io.github.mayubao.kuaichuan.ui.view.RadarScanView;
 import io.github.mayubao.kuaichuan.utils.ListUtils;
@@ -109,7 +109,7 @@ public class ChooseReceiverActivity extends BaseActivity {
         closeSocket();
 
         //断开当前的Wifi网络
-        WifiMgr.getInstance(getContext()).disconnectCurrentNetwork();
+        MyWifiManager.getInstance(getContext()).disconnectCurrentNetwork();
 
         this.finish();
     }
@@ -128,13 +128,13 @@ public class ChooseReceiverActivity extends BaseActivity {
     private void init(){
         radarScanView.startScan();
 
-//        if(WifiMgr.getInstance(getContext()).isWifiEnable()){//wifi打开的情况
+//        if(MyWifiManager.getInstance(getContext()).isWifiEnable()){//wifi打开的情况
 //        }else{//wifi关闭的情况
-//            WifiMgr.getInstance(getContext()).openWifi();
+//            MyWifiManager.getInstance(getContext()).openWifi();
 //        }
 
-        if(!WifiMgr.getInstance(getContext()).isWifiEnable()) {//wifi未打开的情况
-            WifiMgr.getInstance(getContext()).openWifi();
+        if(!MyWifiManager.getInstance(getContext()).isWifiEnable()) {//wifi未打开的情况
+            MyWifiManager.getInstance(getContext()).openWifi();
         }
 
 
@@ -146,8 +146,8 @@ public class ChooseReceiverActivity extends BaseActivity {
      * 获取或者更新wifi扫描列表
      */
     private void getOrUpdateWifiScanResult(){
-        WifiMgr.getInstance(getContext()).startScan();
-        mScanResultList = WifiMgr.getInstance(getContext()).getScanResultList();
+        MyWifiManager.getInstance(getContext()).startScan();
+        mScanResultList = MyWifiManager.getInstance(getContext()).getScanResultList();
         mScanResultList = ListUtils.filterWithNoPassword(mScanResultList);
 
         if(mScanResultList != null){
@@ -163,11 +163,11 @@ public class ChooseReceiverActivity extends BaseActivity {
                     //1.连接网络
                     String ssid = Constant.DEFAULT_SSID;
                     ssid = scanResult.SSID;
-                    WifiMgr.getInstance(getContext()).openWifi();
-                    WifiMgr.getInstance(getContext()).addNetwork(WifiMgr.createWifiCfg(ssid, null, WifiMgr.WIFICIPHER_NOPASS));
+                    MyWifiManager.getInstance(getContext()).openWifi();
+                    MyWifiManager.getInstance(getContext()).addNetwork(MyWifiManager.createWifiCfg(ssid, null, MyWifiManager.WIFICIPHER_NOPASS));
 
                     //2.发送UDP通知信息到 文件接收方 开启ServerSocketRunnable
-                    mUdpServerRuannable = createSendMsgToServerRunnable(WifiMgr.getInstance(getContext()).getIpAddressFromHotspot());
+                    mUdpServerRuannable = createSendMsgToServerRunnable(MyWifiManager.getInstance(getContext()).getIpAddressFromHotspot());
                     AppContext.MAIN_EXECUTOR.execute(mUdpServerRuannable);
                 }
             });
@@ -183,7 +183,7 @@ public class ChooseReceiverActivity extends BaseActivity {
             }
             case R.id.radarView:{
                 Log.i(TAG, "radarView ------>>> click!");
-                mUdpServerRuannable = createSendMsgToServerRunnable(WifiMgr.getInstance(getContext()).getIpAddressFromHotspot());
+                mUdpServerRuannable = createSendMsgToServerRunnable(MyWifiManager.getInstance(getContext()).getIpAddressFromHotspot());
                 AppContext.MAIN_EXECUTOR.execute(mUdpServerRuannable);
                 break;
             }
@@ -223,7 +223,7 @@ public class ChooseReceiverActivity extends BaseActivity {
         int count = 0;
         while(targetIpAddr.equals(Constant.DEFAULT_UNKOWN_IP) && count < Constant.DEFAULT_TRY_TIME){
             Thread.sleep(1000);
-            targetIpAddr = WifiMgr.getInstance(getContext()).getIpAddressFromHotspot();
+            targetIpAddr = MyWifiManager.getInstance(getContext()).getIpAddressFromHotspot();
             Log.i(TAG, "receiver serverIp ----->>>" + targetIpAddr);
             count ++;
         }

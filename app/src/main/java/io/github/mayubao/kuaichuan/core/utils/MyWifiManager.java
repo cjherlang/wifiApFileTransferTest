@@ -7,13 +7,14 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
  * Created by mayubao on 2016/11/2.
  * Contact me 345269374@qq.com
  */
-public class WifiMgr {
+public class MyWifiManager {
 
     /**
      * 创建WifiConfiguration的类型
@@ -23,7 +24,7 @@ public class WifiMgr {
     public static final int WIFICIPHER_WPA = 3;
 
 
-    private static WifiMgr mWifiMgr;
+    private static MyWifiManager mWifiMgr;
     private Context mContext;
     private WifiManager mWifiManager;
 
@@ -35,21 +36,29 @@ public class WifiMgr {
     //current wifi configuration info
     WifiInfo mWifiInfo;
 
-    private WifiMgr(Context context){
+    private MyWifiManager(Context context){
         this.mContext = context;
         this.mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 
-    public static WifiMgr getInstance(Context context){
+    public static MyWifiManager getInstance(Context context){
         if(mWifiMgr == null){
-            synchronized (WifiMgr.class){
+            synchronized (MyWifiManager.class){
                 if(mWifiMgr == null){
-                    mWifiMgr = new WifiMgr(context);
+                    mWifiMgr = new MyWifiManager(context);
                 }
             }
         }
 
         return mWifiMgr;
+    }
+
+    public List<ScanResult> getScanResultList() {
+        return mScanResultList;
+    }
+
+    public List<WifiConfiguration> getWifiConfigurations() {
+        return mWifiConfigurations;
     }
 
     /**
@@ -60,7 +69,6 @@ public class WifiMgr {
             mWifiManager.setWifiEnabled(true);
         }
     }
-
 
     /**
      * 关闭wifi
@@ -76,8 +84,49 @@ public class WifiMgr {
      * 判断wifi是否开启的状态
      * @return
      */
-    public boolean isWifiEnable(){
+    public  boolean isWifiEnable(){
         return mWifiManager == null ? false : mWifiManager.isWifiEnabled();
+    }
+
+    //check whether wifi hotspot on or off
+    public boolean isApOn() {
+        try {
+            Method method = mWifiManager.getClass().getDeclaredMethod("isWifiApEnabled");
+            method.setAccessible(true);
+            return (Boolean) method.invoke(mWifiManager);
+        }
+        catch (Throwable ignored) {}
+        return false;
+    }
+
+    //close wifi hotspot
+    public void disableAp() {
+        try {
+            Method method = mWifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
+            method.invoke(mWifiManager, null, false);
+        } catch (Throwable ignored) {
+
+        }
+    }
+
+    public boolean enableAp(String apName) {
+        //打开热点要先关闭wifi和原来的热点
+        closeWifi();
+        if (isApOn()){
+            disableAp();
+        }
+
+        WifiConfiguration wificonfiguration = null;
+        try {
+            wificonfiguration = MyWifiManager.createWifiCfg(apName, "", 0);
+            Method method = mWifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
+            method.invoke(mWifiManager, wificonfiguration, true);
+            return true;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 
@@ -89,15 +138,6 @@ public class WifiMgr {
         mScanResultList = mWifiManager.getScanResults();
         mWifiConfigurations = mWifiManager.getConfiguredNetworks();
     }
-
-    public List<ScanResult> getScanResultList() {
-        return mScanResultList;
-    }
-
-    public List<WifiConfiguration> getWifiConfigurations() {
-        return mWifiConfigurations;
-    }
-
 
     /**
      * 添加到指定Wifi网络 /切换到指定Wifi网络
@@ -135,45 +175,16 @@ public class WifiMgr {
      * @param type
      * @return
      */
-    public static WifiConfiguration createWifiCfg(String ssid, String password, int type){
+    static public WifiConfiguration createWifiCfg(String ssid, String password, int type){
         WifiConfiguration config = new WifiConfiguration();
-        config.allowedAuthAlgorithms.clear();
-        config.allowedGroupCiphers.clear();
-        config.allowedKeyManagement.clear();
-        config.allowedPairwiseCiphers.clear();
-        config.allowedProtocols.clear();
-
-        config.SSID = "\"" + ssid + "\"";
-
-        if(type == WIFICIPHER_NOPASS){
-//            config.wepKeys[0] = "";
-            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-//            config.wepTxKeyIndex = 0;
-
-//            无密码连接WIFI时，连接不上wifi，需要注释两行代码
-//            config.wepKeys[0] = "";
-//            config.wepTxKeyIndex = 0;
-        }else if(type == WIFICIPHER_WEP){
-            config.hiddenSSID = true;
-            config.wepKeys[0]= "\""+password+"\"";
-            config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            config.wepTxKeyIndex = 0;
-        }else if(type == WIFICIPHER_WPA){
-            config.preSharedKey = "\""+password+"\"";
-            config.hiddenSSID = true;
-            config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-            config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-            config.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-            config.status = WifiConfiguration.Status.ENABLED;
-        }
-
+        config.SSID = ssid ;
+        config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+        config.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+        config.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+        config.preSharedKey = null;
+        config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_EAP,false);
+        config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK,false);
         return config;
     }
 
@@ -237,16 +248,4 @@ public class WifiMgr {
                 + "." + ((address >> 24) & 0xFF));
         return ipAddress;
     }
-
-
-
-    /**
-     * 关闭Wifi
-     */
-    public void disableWifi(){
-        if(mWifiManager != null){
-            mWifiManager.setWifiEnabled(false);
-        }
-    }
-
 }
