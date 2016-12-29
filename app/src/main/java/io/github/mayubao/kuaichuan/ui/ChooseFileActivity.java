@@ -132,10 +132,6 @@ public class ChooseFileActivity extends BaseActivity {
 
             @Override
             public void onPageSelected(int position) {
-//                <item>应用</item>
-//                <item>图片</item>
-//                <item>音乐</item>
-//                <item>视频</item>
                 if (position == 0) { //应用
 
                 } else if (position == 1) { //图片
@@ -203,9 +199,6 @@ public class ChooseFileActivity extends BaseActivity {
                 break;
             }
             case R.id.btn_next:{
-//                btn_selected.setEnabled(false);
-//                btn_selected.setBackgroundResource(R.drawable.shape_bottom_text_unenable);
-//                btn_selected.setTextColor(getResources().getColor(R.color.darker_gray));
                 if(!AppContext.getAppContext().isFileInfoMapExist()){//不存在选中的文件
                     ToastUtils.show(getContext(), getContext().getString(R.string.tip_please_select_your_file));
                     return;

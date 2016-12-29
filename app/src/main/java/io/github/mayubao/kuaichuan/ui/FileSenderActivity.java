@@ -224,10 +224,6 @@ public class FileSenderActivity extends BaseActivity {
         lv_result.setAdapter(mFileSenderAdapter);
 
 
-//        Map<String, FileInfo> dataMap = AppContext.getAppContext().getFileInfoMap();
-//        List<FileInfo> fileInfoList = new ArrayList<>(dataMap.values());
-//        Collections.sort(fileInfoList, Constant.DEFAULT_COMPARATOR2);
-
         List<Map.Entry<String, FileInfo>> fileInfoMapList = new ArrayList<Map.Entry<String, FileInfo>>(AppContext.getAppContext().getFileInfoMap().entrySet());
         Collections.sort(fileInfoMapList, Constant.DEFAULT_COMPARATOR);
 

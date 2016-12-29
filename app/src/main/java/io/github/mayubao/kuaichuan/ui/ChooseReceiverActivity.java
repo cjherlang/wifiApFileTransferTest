@@ -55,10 +55,6 @@ public class ChooseReceiverActivity extends BaseActivity {
      */
     @Bind(R.id.radarView)
     RadarScanView radarScanView;
-//    @Bind(R.id.tab_layout)
-//    TabLayout tab_layout;
-//    @Bind(R.id.view_pager)
-//    ViewPager view_pager;
 
     /**
      * 扫描结果
@@ -128,11 +124,6 @@ public class ChooseReceiverActivity extends BaseActivity {
     private void init(){
         radarScanView.startScan();
 
-//        if(MyWifiManager.getInstance(getContext()).isWifiEnable()){//wifi打开的情况
-//        }else{//wifi关闭的情况
-//            MyWifiManager.getInstance(getContext()).openWifi();
-//        }
-
         if(!MyWifiManager.getInstance(getContext()).isWifiEnable()) {//wifi未打开的情况
             MyWifiManager.getInstance(getContext()).openWifi();
         }
@@ -179,12 +170,6 @@ public class ChooseReceiverActivity extends BaseActivity {
         switch (view.getId()){
             case R.id.tv_back:{
                 onBackPressed();
-                break;
-            }
-            case R.id.radarView:{
-                Log.i(TAG, "radarView ------>>> click!");
-                mUdpServerRuannable = createSendMsgToServerRunnable(MyWifiManager.getInstance(getContext()).getIpAddressFromHotspot());
-                AppContext.MAIN_EXECUTOR.execute(mUdpServerRuannable);
                 break;
             }
         }
