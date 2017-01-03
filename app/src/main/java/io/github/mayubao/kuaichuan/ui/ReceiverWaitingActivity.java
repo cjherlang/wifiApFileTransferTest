@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -196,7 +197,9 @@ public class ReceiverWaitingActivity extends BaseActivity {
             count ++;
         }
 
-        mDatagramSocket = new DatagramSocket(serverPort);
+        mDatagramSocket = new DatagramSocket(null);
+        mDatagramSocket.setReuseAddress(true);
+        mDatagramSocket.bind(new InetSocketAddress(serverPort));
         byte[] receiveData = new byte[1024];
         byte[] sendData = null;
         while(true) {

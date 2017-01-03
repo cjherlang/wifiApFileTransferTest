@@ -35,7 +35,7 @@ public class Constant {
     /**
      * 文件传输监听 默认端口
      */
-    public static final int DEFAULT_SERVER_PORT = 8080;
+    public static final int DEFAULT_SERVER_PORT = 1234;
 
     /**
      * UDP通信服务 默认端口

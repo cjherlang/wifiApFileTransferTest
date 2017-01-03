@@ -7,7 +7,10 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,6 +68,9 @@ public class MyWifiManager {
      * 打开wifi
      */
     public void openWifi(){
+        if(isApOn()){
+            disableAp();
+        }
         if(!mWifiManager.isWifiEnabled()){
             mWifiManager.setWifiEnabled(true);
         }
@@ -219,11 +225,17 @@ public class MyWifiManager {
      * @return
      */
     public String getIpAddressFromHotspot(){
-        // WifiAP ip address is hardcoded in Android.
-        /* IP/netmask: 192.168.43.1/255.255.255.0 */
-        String ipAddress = "192.168.43.1";
-        DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
-        int address = dhcpInfo.gateway;
+//        String ipAddress = "192.168.43.1";
+        String ipAddress;
+        int address = 0;
+        DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();//动态分配器信息
+        int gateway = dhcpInfo.gateway;  //动态分配器网关，一般等于serverAddress
+        int serverAddress = dhcpInfo.serverAddress;  //连接的ap的ip
+        if (gateway != 0){
+            address = gateway;
+        } else {
+            address = serverAddress;
+        }
         ipAddress = ((address & 0xFF)
                 + "." + ((address >> 8) & 0xFF)
                 + "." + ((address >> 16) & 0xFF)
@@ -247,5 +259,41 @@ public class MyWifiManager {
                 + "." + ((address >> 16) & 0xFF)
                 + "." + ((address >> 24) & 0xFF));
         return ipAddress;
+    }
+
+    /**
+     * 读取连接的热备的ip，由于要读取文件，所以不建议使用，仅仅用来测试查看
+     * @return
+     */
+    private ArrayList<String> getConnectedHotIP() {
+        ArrayList<String> connectedIP = new ArrayList<String>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(
+                    "/proc/net/arp"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] splitted = line.split(" +");
+                if (splitted != null && splitted.length >= 4) {
+                    String ip = splitted[0];
+                    connectedIP.add(ip);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return connectedIP;
+    }
+
+    //输出链接到当前设备的IP地址
+    public void printHotIp() {
+        ArrayList<String> connectedIP = getConnectedHotIP();
+        StringBuilder resultList = new StringBuilder();
+        for (String ip : connectedIP) {
+            resultList.append(ip);
+            resultList.append("\n");
+        }
+        System.out.print("printHotIp ==== ip \n");
+        System.out.print("wifiAp:" + getIpAddressFromHotspot() + "\n");
+        System.out.print(resultList);
     }
 }

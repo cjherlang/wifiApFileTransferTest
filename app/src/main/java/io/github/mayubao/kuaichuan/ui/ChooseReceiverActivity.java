@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -155,7 +156,13 @@ public class ChooseReceiverActivity extends BaseActivity {
                     String ssid = Constant.DEFAULT_SSID;
                     ssid = scanResult.SSID;
                     MyWifiManager.getInstance(getContext()).openWifi();
-                    MyWifiManager.getInstance(getContext()).addNetwork(MyWifiManager.createWifiCfg(ssid, null, MyWifiManager.WIFICIPHER_NOPASS));
+                    boolean isConnected = false;
+                    int connectCount = 10;
+                    while (!isConnected && connectCount > 0){
+                        isConnected = MyWifiManager.getInstance(getContext()).addNetwork(MyWifiManager.createWifiCfg(ssid, null, MyWifiManager.WIFICIPHER_NOPASS));
+                        --connectCount;
+                    }
+                    Log.i(TAG, "on connected");
 
                     //2.发送UDP通知信息到 文件接收方 开启ServerSocketRunnable
                     mUdpServerRuannable = createSendMsgToServerRunnable(MyWifiManager.getInstance(getContext()).getIpAddressFromHotspot());
@@ -221,7 +228,9 @@ public class ChooseReceiverActivity extends BaseActivity {
             count ++;
         }
 
-        mDatagramSocket = new DatagramSocket(serverPort);
+        mDatagramSocket = new DatagramSocket(null);
+        mDatagramSocket.setReuseAddress(true);
+        mDatagramSocket.bind(new InetSocketAddress(serverPort));
         byte[] receiveData = new byte[1024];
         byte[] sendData = null;
         InetAddress ipAddress = InetAddress.getByName(targetIpAddr);

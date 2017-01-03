@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -235,7 +236,9 @@ public class FileReceiverActivity extends BaseActivity {
     DatagramSocket mDatagramSocket;
     public void sendFileReceiverInitSuccessMsgToFileSender(IpPortInfo ipPortInfo) throws Exception{
         Log.i(TAG, "sendFileReceiverInitSuccessMsgToFileSender------>>>start");
-        mDatagramSocket = new DatagramSocket(ipPortInfo.getPort() +1);
+        mDatagramSocket = new DatagramSocket(null);
+        mDatagramSocket.setReuseAddress(true);
+        mDatagramSocket.bind(new InetSocketAddress(ipPortInfo.getPort()));
         byte[] receiveData = new byte[1024];
         byte[] sendData = null;
         InetAddress ipAddress = ipPortInfo.getInetAddress();
@@ -246,6 +249,7 @@ public class FileReceiverActivity extends BaseActivity {
         mDatagramSocket.send(sendPacket);
         Log.i(TAG, "Send Msg To FileSender######>>>" + Constant.MSG_FILE_RECEIVER_INIT_SUCCESS);
         Log.i(TAG, "sendFileReceiverInitSuccessMsgToFileSender------>>>end");
+        closeSocket();
     }
 
     /**
