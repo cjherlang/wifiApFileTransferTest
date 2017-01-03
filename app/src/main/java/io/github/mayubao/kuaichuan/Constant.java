@@ -35,12 +35,12 @@ public class Constant {
     /**
      * 文件传输监听 默认端口
      */
-    public static final int DEFAULT_SERVER_PORT = 1234;
+    public static final int DEFAULT_SERVER_PORT = 1235;
 
     /**
      * UDP通信服务 默认端口
      */
-    public static final int DEFAULT_SERVER_COM_PORT = 8099;
+    public static final int DEFAULT_SERVER_COM_PORT = 1234;
 
 
 
@@ -69,6 +69,16 @@ public class Constant {
     public static final String MSG_FILE_RECEIVER_INIT = "MSG_FILE_RECEIVER_INIT";
     public static final String MSG_FILE_RECEIVER_INIT_SUCCESS = "MSG_FILE_RECEIVER_INIT_SUCCESS";
     public static final String MSG_FILE_SENDER_START = "MSG_FILE_SENDER_START";
+
+    /**
+     * IOS HANDLE
+     */
+    public static final String MSG_IOS_ON_CONNECTED = "MSG_IOS_ON_CONNECTED";
+    //iOS Receive
+    public static final String MSG_IOS_ON_SERVER_INIT = "MSG_REQUEST_IOS_ON_SERVER_INIT";
+    public static final String MSG_IOS_ON_SERVER_INIT_SUCCESS = "MSG_HANDLE_IOS_ON_SERVER_INIT_SUCCESS";
+    //Android Receive
+    public static final String MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS = "MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS";
 
 
 

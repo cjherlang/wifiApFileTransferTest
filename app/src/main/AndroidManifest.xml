@@ -61,6 +61,11 @@
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
+        <!-- ios等待界面 -->
+        <activity
+            android:name=".ui.TranslateWithIOS"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
     </application>
 
 </manifest>

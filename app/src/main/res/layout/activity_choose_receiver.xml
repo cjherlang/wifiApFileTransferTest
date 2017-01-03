@@ -22,8 +22,8 @@
 
     <io.github.mayubao.kuaichuan.ui.view.RadarScanView
         android:id="@+id/radarView"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/tv_top_tip"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
@@ -35,9 +35,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/radarView"
+        android:layout_above="@+id/translate_to_ios"
         android:divider="@null"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+    <TextView
+        android:id="@+id/translate_to_ios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="给iOS传文件"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

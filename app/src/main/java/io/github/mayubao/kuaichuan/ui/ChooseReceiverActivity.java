@@ -1,5 +1,6 @@
 package io.github.mayubao.kuaichuan.ui;
 
+import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,16 +21,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.github.mayubao.kuaichuan.AppContext;
 import io.github.mayubao.kuaichuan.Constant;
 import io.github.mayubao.kuaichuan.R;
 import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.BaseTransfer;
-import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.MyWifiManager;
+import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.utils.ToastUtils;
 import io.github.mayubao.kuaichuan.ui.adapter.WifiScanResultAdapter;
 import io.github.mayubao.kuaichuan.ui.view.RadarScanView;
@@ -42,25 +40,18 @@ import io.github.mayubao.kuaichuan.utils.NetUtils;
  * Created by mayubao on 2016/11/28.
  * Contact me 345269374@qq.com
  */
-public class ChooseReceiverActivity extends BaseActivity {
+public class ChooseReceiverActivity extends BaseActivity implements View.OnClickListener{
 
     private static final String TAG = ChooseReceiverActivity.class.getSimpleName();
-    /**
-     * Topbar相关UI
-     */
-    @Bind(R.id.tv_back)
-    TextView tv_back;
 
     /**
      * 其他UI
      */
-    @Bind(R.id.radarView)
     RadarScanView radarScanView;
 
     /**
      * 扫描结果
      */
-    @Bind(R.id.lv_result)
     ListView lv_result;
 
     List<ScanResult> mScanResultList;
@@ -94,10 +85,26 @@ public class ChooseReceiverActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_receiver);
-
-        ButterKnife.bind(this);
+        findViewById();
 
         init();
+    }
+
+    void findViewById(){
+        TextView back = (TextView) findViewById(R.id.tv_back);
+        TextView iosText = (TextView) findViewById(R.id.translate_to_ios);
+        back.setOnClickListener(this);
+        iosText.setOnClickListener(this);
+
+        /**
+         * 其他UI
+         */
+        radarScanView = (RadarScanView) findViewById(R.id.radarView);
+
+        /**
+         * 扫描结果
+         */
+        lv_result = (ListView) findViewById(R.id.lv_result);
     }
 
     @Override
@@ -172,16 +179,21 @@ public class ChooseReceiverActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.tv_back, R.id.radarView})
-    public void onClick(View view){
-        switch (view.getId()){
-            case R.id.tv_back:{
-                onBackPressed();
-                break;
-            }
+    @Override
+    public void onClick(View v) {
+        int viewId = v.getId();
+        if (viewId == R.id.tv_back){
+            onBackPressed();
+        }
+        if (viewId == R.id.translate_to_ios){
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("isSend", true);
+            Intent intent = new Intent(this, TranslateWithIOS.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+            finishNormal();
         }
     }
-
 
     /**
      * 创建发送UDP消息到 文件接收方 的服务线程

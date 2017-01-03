@@ -23,7 +23,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tv_top_tip">
+        android:layout_below="@id/tv_top_tip"
+        android:layout_above="@+id/translate_to_ios">
         <io.github.mayubao.kuaichuan.ui.view.RadarLayout
             android:id="@+id/radarLayout"
             android:layout_height="match_parent"
@@ -60,5 +61,16 @@
             android:layout_below="@id/tv_device_name" />
 
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/translate_to_ios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="从iOS接收文件"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@android:color/white"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

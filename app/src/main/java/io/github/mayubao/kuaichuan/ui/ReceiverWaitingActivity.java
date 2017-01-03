@@ -1,5 +1,6 @@
 package io.github.mayubao.kuaichuan.ui;
 
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,38 +14,26 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.github.mayubao.kuaichuan.AppContext;
 import io.github.mayubao.kuaichuan.Constant;
 import io.github.mayubao.kuaichuan.R;
 import io.github.mayubao.kuaichuan.common.BaseActivity;
+import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.entity.IpPortInfo;
 import io.github.mayubao.kuaichuan.core.receiver.WifiAPBroadcastReceiver;
-import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.TextUtils;
 import io.github.mayubao.kuaichuan.ui.view.RadarLayout;
 import io.github.mayubao.kuaichuan.utils.NavigatorUtils;
 
-public class ReceiverWaitingActivity extends BaseActivity {
+public class ReceiverWaitingActivity extends BaseActivity implements View.OnClickListener{
 
     private static final String TAG = ReceiverWaitingActivity.class.getSimpleName();
     /**
-     * Topbar相关UI
-     */
-    @Bind(R.id.tv_back)
-    TextView tv_back;
-
-    /**
      * 其他UI
      */
-    @Bind(R.id.radarLayout)
     RadarLayout radarLayout;
-    @Bind(R.id.tv_device_name)
     TextView tv_device_name;
-    @Bind(R.id.tv_desc)
     TextView tv_desc;
 
     WifiAPBroadcastReceiver mWifiAPBroadcastReceiver;
@@ -76,10 +65,18 @@ public class ReceiverWaitingActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receiver_waiting);
-
-        ButterKnife.bind(this);
-
+        findViewById();
         init();
+    }
+
+    void findViewById(){
+        TextView back = (TextView) findViewById(R.id.tv_back);
+        TextView iosText = (TextView) findViewById(R.id.translate_to_ios);
+        back.setOnClickListener(this);
+        iosText.setOnClickListener(this);
+        radarLayout = (RadarLayout) findViewById(R.id.radarLayout);
+        tv_device_name = (TextView) findViewById(R.id.tv_device_name);
+        tv_desc = (TextView) findViewById(R.id.tv_desc);
     }
 
     @Override
@@ -152,13 +149,20 @@ public class ReceiverWaitingActivity extends BaseActivity {
         tv_desc.setText(getResources().getString(R.string.tip_now_is_initial));
     }
 
-    @OnClick({R.id.tv_back})
-    public void onClick(View view){
-        switch (view.getId()){
-            case R.id.tv_back:{
-                onBackPressed();
-                break;
-            }
+
+    @Override
+    public void onClick(View v) {
+        int viewId = v.getId();
+        if (viewId == R.id.tv_back){
+            onBackPressed();
+        }
+        if (viewId == R.id.translate_to_ios){
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("isSend", false);
+            Intent intent = new Intent(this, TranslateWithIOS.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+            finishNormal();
         }
     }
 
