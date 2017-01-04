@@ -1,6 +1,7 @@
-package io.github.mayubao.kuaichuan.ui;
+package io.github.mayubao.kuaichuan.core.iOS;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,13 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
 
 import io.github.mayubao.kuaichuan.AppContext;
 import io.github.mayubao.kuaichuan.Constant;
@@ -46,23 +46,33 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
     boolean mIsInitialized = false;
     boolean mIsSendFile = false;
 
+    String mIOSServerIp = "";
+
     /**
      * 与 ios 通信的 线程
      */
     Runnable mUdpServerRuannable;
     public static final int MSG_TO_START_SEND_TO_IOS = 0X89;
     public static final int MSG_TO_START_IOS_RECEIVE_SERVER = 0X90;
+    public static final int MSG_TO_RECEIVE_BROADCAST = 0X91;
     Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == MSG_TO_START_SEND_TO_IOS){
                 //(Todo:jhchen) 开始发送文件
                 Log.i(TAG, "go to send to ios ######>>>" + MSG_TO_START_SEND_TO_IOS);
+                Intent intent = new Intent(mContext, iOSFileSenderActivity.class);
+                intent.putExtra("serverIp", mIOSServerIp);
+                startActivity(intent);
                 finishNormal();
             }else if(msg.what == MSG_TO_START_IOS_RECEIVE_SERVER){
                 //(Todo:jhchen)启动接收文件服务器
                 Log.i(TAG, "go to send start ios receiver server ######>>>" + MSG_TO_START_IOS_RECEIVE_SERVER);
+                startActivity(new Intent(mContext, iOSFileReceiverActivity.class));
                 finishNormal();
+            }else if (msg.what == MSG_TO_RECEIVE_BROADCAST){
+                //broadcast test
+                Toast.makeText(mContext, "get broadcast", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -132,15 +142,15 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View v) {
         int viewId = v.getId();
-//        if (viewId == R.id.tv_back){
-//            onBackPressed();
-//        }
+        if (viewId == R.id.tv_back){
+            onBackPressed();
+        }
 
         //(Todo:jhchen)debug
-        if (viewId == R.id.tv_back){
-            MyWifiManager.getInstance(mContext).printHotIp();
-            new UdpBroadCast("hello").start();
-        }
+//        if (viewId == R.id.tv_back){
+//            MyWifiManager.getInstance(mContext).printHotIp();
+//            new MyWifiManager.UdpBroadCast(Constant.MSG_IOS_ON_CONNECTED).start();
+//        }
     }
 
     @Override
@@ -190,30 +200,22 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
         byte[] receiveData = new byte[1024];
 
         while(true) {
-            //1.接收 文件发送方的消息
-            sendData = Constant.MSG_IOS_ON_SERVER_INIT.getBytes(BaseTransfer.UTF_8);
-            InetAddress inetAddressTest = InetAddress.getByName("255.255.255.255");
-            DatagramPacket sendPacket2 = new DatagramPacket(sendData, sendData.length, inetAddressTest, 1234);
-            mDatagramSocket.send(sendPacket2);
-
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             mDatagramSocket.receive(receivePacket);
             String msg = new String( receivePacket.getData()).trim();
             InetAddress ipAddress = receivePacket.getAddress();
-            int port = receivePacket.getPort();
-            Log.i(TAG, "Get the msg from ios ######>>>");
+            int udpPort = receivePacket.getPort(); //端口号取到不对应，有待调查，目前先写死
+            int port = Constant.DEFAULT_SERVER_COM_PORT;
             if(msg != null && msg.startsWith(Constant.MSG_IOS_ON_CONNECTED)){
                 Log.i(TAG, "Get the msg from ios ###### connected>>>" + Constant.MSG_IOS_ON_CONNECTED);
                 if (mIsSendFile){
                     //发送文件，通知ios初始化
                     sendData = Constant.MSG_IOS_ON_SERVER_INIT.getBytes(BaseTransfer.UTF_8);
-                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, ipAddress, port);
-                    mDatagramSocket.send(sendPacket);
+                    new MyWifiManager.UdpSendPacket(mDatagramSocket, sendData, ipAddress, port).start();
                 } else {
                     //接收文件，通知ios已经初始化完毕
                     sendData = Constant.MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS.getBytes(BaseTransfer.UTF_8);
-                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, ipAddress, port);
-                    mDatagramSocket.send(sendPacket);
+                    new MyWifiManager.UdpSendPacket(mDatagramSocket, sendData, ipAddress, port).start();
                     //(Todo:jhchen)启动接收文件服务器
                     mHandler.obtainMessage(MSG_TO_START_IOS_RECEIVE_SERVER).sendToTarget();
                 }
@@ -221,7 +223,12 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
                 //发送文件，接收ios通知初始化完毕，可以直接开始发送文件
                 Log.i(TAG, "Get the msg from ios######>>>" + Constant.MSG_IOS_ON_SERVER_INIT_SUCCESS);
                 //(Todo:jhchen) 开始发送文件
+                mIOSServerIp = ipAddress.toString();
+                mIOSServerIp = mIOSServerIp.substring(mIOSServerIp.lastIndexOf("/") + 1);
                 mHandler.obtainMessage(MSG_TO_START_SEND_TO_IOS).sendToTarget();
+            } else {
+                //broadcast test
+                //mHandler.obtainMessage(MSG_TO_RECEIVE_BROADCAST).sendToTarget();
             }
         }
     }
@@ -234,30 +241,6 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             mDatagramSocket.disconnect();
             mDatagramSocket.close();
             mDatagramSocket = null;
-        }
-    }
-
-    private  class UdpBroadCast extends Thread {
-        MulticastSocket sender = null;
-        DatagramPacket dj = null;
-        InetAddress group = null;
-        byte[] data = new byte[1024];
-
-        public UdpBroadCast(String dataString) {
-            data = dataString.getBytes();
-        }
-
-        @Override
-        public void run() {
-            try {
-                sender = new MulticastSocket();
-                group = InetAddress.getByName("224.0.0.1");
-                dj = new DatagramPacket(data, data.length, group, 1234);
-                sender.send(dj);
-                sender.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

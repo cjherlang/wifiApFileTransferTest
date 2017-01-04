@@ -9,7 +9,12 @@ import android.net.wifi.WifiManager;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -295,5 +300,54 @@ public class MyWifiManager {
         System.out.print("printHotIp ==== ip \n");
         System.out.print("wifiAp:" + getIpAddressFromHotspot() + "\n");
         System.out.print(resultList);
+    }
+
+    //android 发送udp广播给连接热点的所有设备
+    static public class UdpBroadCast extends Thread {
+        MulticastSocket sender = null;
+        DatagramPacket dj = null;
+        InetAddress group = null;
+        byte[] data = new byte[1024];
+
+        public UdpBroadCast(String dataString) {
+            data = dataString.getBytes();
+        }
+
+        @Override
+        public void run() {
+            try {
+                sender = new MulticastSocket();
+                group = InetAddress.getByName("192.168.43.255");
+                dj = new DatagramPacket(data, data.length, group, 1234);
+                sender.send(dj);
+                sender.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    static public class UdpSendPacket extends Thread{
+        DatagramSocket mDatagramSocket = null;
+        InetAddress ipAddress = null;
+        byte[] data = new byte[1024];
+        int port;
+
+        public UdpSendPacket(DatagramSocket datagramSocket, byte[] data, InetAddress ipAddress,int port) {
+            mDatagramSocket = datagramSocket;
+            this.data = data;
+            this.ipAddress = ipAddress;
+            this.port = port;
+        }
+
+        @Override
+        public void run() {
+            try {
+                DatagramPacket sendPacket = new DatagramPacket(data, data.length, ipAddress, port);
+                mDatagramSocket.send(sendPacket);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

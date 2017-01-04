@@ -28,6 +28,7 @@ import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.BaseTransfer;
 import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
+import io.github.mayubao.kuaichuan.core.iOS.TranslateWithIOS;
 import io.github.mayubao.kuaichuan.core.utils.ToastUtils;
 import io.github.mayubao.kuaichuan.ui.adapter.WifiScanResultAdapter;
 import io.github.mayubao.kuaichuan.ui.view.RadarScanView;
