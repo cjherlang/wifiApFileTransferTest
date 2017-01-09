@@ -188,6 +188,18 @@ public class FileInfo implements Serializable{
         return jsonObject.toString();
     }
 
+    public static String toJsonStrWithoutTeype(FileInfo fileInfo){
+        String jsonStr = "";
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("filePath", fileInfo.getFilePath());
+            jsonObject.put("size", fileInfo.getSize());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
+    }
+
     public static FileInfo toObject(String jsonStr){
         FileInfo fileInfo = new FileInfo();
         try {
@@ -199,6 +211,21 @@ public class FileInfo implements Serializable{
             fileInfo.setFilePath(filePath);
             fileInfo.setSize(size);
             fileInfo.setFileType(type);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return fileInfo;
+    }
+
+    public static FileInfo toObjectWithoutType(String jsonStr){
+        FileInfo fileInfo = new FileInfo();
+        try {
+            JSONObject jsonObject =  new JSONObject(jsonStr);
+            String filePath = (String) jsonObject.get("filePath");
+            long size = jsonObject.getLong("size");
+
+            fileInfo.setFilePath(filePath);
+            fileInfo.setSize(size);
         } catch (JSONException e) {
             e.printStackTrace();
         }

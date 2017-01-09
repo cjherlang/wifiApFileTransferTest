@@ -61,14 +61,14 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             if(msg.what == MSG_TO_START_SEND_TO_IOS){
                 //(Todo:jhchen) 开始发送文件
                 Log.i(TAG, "go to send to ios ######>>>" + MSG_TO_START_SEND_TO_IOS);
-                Intent intent = new Intent(mContext, iOSFileSenderActivity.class);
+                Intent intent = new Intent(mContext, IOSFileSenderActivity.class);
                 intent.putExtra("serverIp", mIOSServerIp);
                 startActivity(intent);
                 finishNormal();
             }else if(msg.what == MSG_TO_START_IOS_RECEIVE_SERVER){
                 //(Todo:jhchen)启动接收文件服务器
                 Log.i(TAG, "go to send start ios receiver server ######>>>" + MSG_TO_START_IOS_RECEIVE_SERVER);
-                startActivity(new Intent(mContext, iOSFileReceiverActivity.class));
+                startActivity(new Intent(mContext, IOSFileReceiverActivity.class));
                 finishNormal();
             }else if (msg.what == MSG_TO_RECEIVE_BROADCAST){
                 //broadcast test
@@ -146,7 +146,7 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             onBackPressed();
         }
 
-        //(Todo:jhchen)debug
+        //(Todo:jhchen) udp broadcast debug
 //        if (viewId == R.id.tv_back){
 //            MyWifiManager.getInstance(mContext).printHotIp();
 //            new MyWifiManager.UdpBroadCast(Constant.MSG_IOS_ON_CONNECTED).start();
@@ -165,6 +165,8 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             mWifiAPBroadcastReceiver = null;
         }
         closeSocket();
+        //关闭热点
+        MyWifiManager.getInstance(mContext).disableAp();
         finish();
     }
 
