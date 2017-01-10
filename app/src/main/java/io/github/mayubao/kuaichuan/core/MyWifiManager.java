@@ -267,7 +267,7 @@ public class MyWifiManager {
     }
 
     /**
-     * 读取连接的热备的ip，由于要读取文件，所以不建议使用，仅仅用来测试查看
+     * 读取连接的热点的设备的ip，由于要读取文件，所以不建议监听使用，仅仅用来测试查看
      * @return
      */
     private ArrayList<String> getConnectedHotIP() {

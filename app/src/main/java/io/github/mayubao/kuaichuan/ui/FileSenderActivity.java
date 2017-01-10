@@ -15,53 +15,42 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.github.mayubao.kuaichuan.AppContext;
 import io.github.mayubao.kuaichuan.Constant;
 import io.github.mayubao.kuaichuan.R;
 import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.FileSender;
+import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
-import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.ui.adapter.FileSenderAdapter;
 
 /**
  * Created by mayubao on 2016/11/28.
  * Contact me 345269374@qq.com
  */
-public class FileSenderActivity extends BaseActivity {
+public class FileSenderActivity extends BaseActivity implements View.OnClickListener{
 
     private static final String TAG = FileSenderActivity.class.getSimpleName();
 
     /**
      * Topbar相关UI
      */
-    @Bind(R.id.tv_back)
     TextView tv_back;
-    @Bind(R.id.tv_title)
     TextView tv_title;
 
     /**
      * 进度条 已传 耗时等UI组件
      */
-    @Bind(R.id.pb_total)
     ProgressBar pb_total;
-    @Bind(R.id.tv_value_storage)
     TextView tv_value_storage;
-    @Bind(R.id.tv_unit_storage)
     TextView tv_unit_storage;
-    @Bind(R.id.tv_value_time)
     TextView tv_value_time;
-    @Bind(R.id.tv_unit_time)
     TextView tv_unit_time;
 
     /**
      * 其他UI
      */
-    @Bind(R.id.lv_result)
     ListView lv_result;
 
     FileSenderAdapter mFileSenderAdapter;
@@ -140,10 +129,21 @@ public class FileSenderActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_sender);
-
-        ButterKnife.bind(this);
-
+        findViewById();
         init();
+    }
+
+    public void findViewById(){
+        tv_back = (TextView) findViewById(R.id.tv_back);
+        tv_back.setOnClickListener(this);
+        tv_title = (TextView) findViewById(R.id.tv_back);
+        pb_total = (ProgressBar) findViewById(R.id.pb_total);
+        tv_value_storage = (TextView) findViewById(R.id.tv_value_storage);
+        tv_unit_storage = (TextView) findViewById(R.id.tv_unit_storage);
+        tv_value_time = (TextView) findViewById(R.id.tv_value_time);
+        tv_unit_time = (TextView) findViewById(R.id.tv_unit_time);
+
+        lv_result = (ListView) findViewById(R.id.lv_result);
     }
 
     @Override
@@ -292,7 +292,9 @@ public class FileSenderActivity extends BaseActivity {
 //        AppContext.FILE_SENDER_EXECUTOR.execute();
     }
 
-    @OnClick({R.id.tv_back})
+
+
+    @Override
     public void onClick(View view){
         switch (view.getId()){
             case R.id.tv_back:{

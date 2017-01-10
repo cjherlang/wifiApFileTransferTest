@@ -73,12 +73,12 @@ public class Constant {
     /**
      * IOS HANDLE
      */
-    public static final String MSG_IOS_ON_CONNECTED = "MSG_IOS_ON_CONNECTED";
+    public static final String MSG_IOS_ON_CONNECTED = "MSG_IOS_ON_CONNECTED";   //iOS广播通知已经连接上
     //iOS Receive
-    public static final String MSG_IOS_ON_SERVER_INIT = "MSG_REQUEST_IOS_ON_SERVER_INIT";
-    public static final String MSG_IOS_ON_SERVER_INIT_SUCCESS = "MSG_HANDLE_IOS_ON_SERVER_INIT_SUCCESS";
+    public static final String MSG_IOS_ON_SERVER_INIT = "MSG_REQUEST_IOS_ON_SERVER_INIT";  //iOS接收文件时，android通知iOS初始化服务器，并给iOS提供androidip
+    public static final String MSG_IOS_ON_SERVER_INIT_SUCCESS = "MSG_HANDLE_IOS_ON_SERVER_INIT_SUCCESS"; //iOS接收文件时通知已经初始化成功
     //Android Receive
-    public static final String MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS = "MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS";
+    public static final String MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS = "MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS";  //Android接收文件时，通知iOS已经初始化服务器
 
 
 
