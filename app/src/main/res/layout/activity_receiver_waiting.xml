@@ -64,7 +64,7 @@
 
     <TextView
         android:id="@+id/translate_to_ios"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="从iOS接收文件"
         android:layout_marginTop="16dp"
@@ -72,5 +72,30 @@
         android:layout_marginBottom="8dp"
         android:textColor="@android:color/white"
         android:layout_alignParentBottom="true"/>
+    <TextView
+        android:id="@+id/translate_to_ios_server"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启动服务器"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@android:color/white"
+        android:layout_toLeftOf="@+id/translate_to_ios_client"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/translate_to_ios_client"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启动客户端"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@android:color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:visibility="gone"/>
 
 </RelativeLayout>

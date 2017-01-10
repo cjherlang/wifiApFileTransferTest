@@ -15,6 +15,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.github.mayubao.kuaichuan.R;
 import io.github.mayubao.kuaichuan.common.BaseActivity;
+import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
 import io.github.mayubao.kuaichuan.core.utils.ToastUtils;
 import io.github.mayubao.kuaichuan.utils.NavigatorUtils;
@@ -78,6 +79,8 @@ public class HomeActivity extends BaseActivity {
     @Override
     protected void onResume() {
         updateBottomData();
+        //关闭热点
+        MyWifiManager.getInstance(getContext()).disableAp();
         super.onResume();
     }
 

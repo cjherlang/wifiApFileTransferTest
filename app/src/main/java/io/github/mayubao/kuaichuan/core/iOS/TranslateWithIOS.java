@@ -85,6 +85,7 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
         getBaseData();
         findViewById();
         init();
+        androidTest();
     }
 
     void findViewById(){
@@ -96,6 +97,26 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
         tv_device_name = (TextView) findViewById(R.id.tv_device_name);
         tv_desc = (TextView) findViewById(R.id.tv_desc);
         tv_top_tip = (TextView) findViewById(R.id.tv_top_tip);
+    }
+
+    void androidTest(){
+        TextView client = (TextView) findViewById(R.id.translate_to_ios_client);
+        TextView server = (TextView) findViewById(R.id.translate_to_ios_server);
+        client.setVisibility(View.VISIBLE);
+        server.setVisibility(View.VISIBLE);
+        client.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIOSServerIp = "192.168.43.1";
+                mHandler.obtainMessage(MSG_TO_START_SEND_TO_IOS).sendToTarget();
+            }
+        });
+        server.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mHandler.obtainMessage(MSG_TO_START_IOS_RECEIVE_SERVER).sendToTarget();
+            }
+        });
     }
 
     void getBaseData(){
@@ -165,8 +186,6 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             mWifiAPBroadcastReceiver = null;
         }
         closeSocket();
-        //关闭热点
-        MyWifiManager.getInstance(mContext).disableAp();
         finish();
     }
 

@@ -59,7 +59,7 @@ public class IOSFileSenderActivity extends AppCompatActivity implements View.OnC
     long mLastUpdateTime = 0;
     String[] mTimeArray = null;
 
-    //send
+
     Context mContext;
     String mServerIp = "";
     List<IOSFileSender> mFileSenderList = new ArrayList<>();
