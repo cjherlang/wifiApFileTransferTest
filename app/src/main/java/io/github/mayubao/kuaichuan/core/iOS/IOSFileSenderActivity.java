@@ -96,7 +96,7 @@ public class IOSFileSenderActivity extends AppCompatActivity implements View.OnC
     public void findViewById(){
         TextView backText = (TextView) findViewById(R.id.tv_back);
         backText.setOnClickListener(this);
-        tv_title = (TextView) findViewById(R.id.tv_back);
+        tv_title = (TextView) findViewById(R.id.tv_title);
         pb_total = (ProgressBar) findViewById(R.id.pb_total);
         tv_value_storage = (TextView) findViewById(R.id.tv_value_storage);
         tv_unit_storage = (TextView) findViewById(R.id.tv_unit_storage);
@@ -120,10 +120,9 @@ public class IOSFileSenderActivity extends AppCompatActivity implements View.OnC
     public void startSend(){
         List<Map.Entry<String, FileInfo>> fileInfoMapList = new ArrayList<Map.Entry<String, FileInfo>>(AppContext.getAppContext().getFileInfoMap().entrySet());
         Collections.sort(fileInfoMapList, Constant.DEFAULT_COMPARATOR);
-        String serverIp = MyWifiManager.getInstance(mContext).getIpAddressFromHotspot();
         for(Map.Entry<String, FileInfo> entry : fileInfoMapList){
             final FileInfo fileInfo = entry.getValue();
-            IOSFileSender fileSender = new IOSFileSender(mContext, fileInfo, serverIp, Constant.DEFAULT_SERVER_PORT);
+            IOSFileSender fileSender = new IOSFileSender(mContext, fileInfo, mServerIp, Constant.DEFAULT_SERVER_PORT);
             fileSender.setOniOSFileSendListener(new IOSFileSender.OnIOSFileSendListener() {
                 @Override
                 public void onStart() {

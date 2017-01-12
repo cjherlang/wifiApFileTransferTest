@@ -72,9 +72,9 @@ public class IOSFileReceiver extends BaseTransfer implements Runnable {
         }
 
         //(Todo:jhchen) hello string test
-        if (helloTest()){
-            return;
-        }
+//        if (helloTest()){
+//            return;
+//        }
 
         //解析头部
         try {
@@ -245,7 +245,9 @@ public class IOSFileReceiver extends BaseTransfer implements Runnable {
             int len = 0;
             len = mInputStream.read(receiveTest);
             if (len != -1){
-                Log.i(TAG, "helloTestReceive: " + receiveTest.toString());
+                String receive = new String(receiveTest, UTF_8);
+                receive.trim();
+                Log.i(TAG, "helloTestReceive: " + receive);
             }
             finish();
         } catch (Exception e) {

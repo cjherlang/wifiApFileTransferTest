@@ -5,6 +5,7 @@ package io.github.mayubao.kuaichuan.core.iOS;
  */
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -94,9 +95,9 @@ public class IOSFileSender extends BaseTransfer implements Runnable {
         }
 
         //(Todo:jhchen) hello string test
-        if (helloTest()){
-            return;
-        }
+//        if (helloTest()){
+//            return;
+//        }
 
         //解析头部
         try {
@@ -130,9 +131,13 @@ public class IOSFileSender extends BaseTransfer implements Runnable {
 
     @Override
     public void init() throws Exception  {
-        this.mSocket = new Socket(mServerIpAddress, mPort);
-        OutputStream os = this.mSocket.getOutputStream();
-        mOutputStream = new BufferedOutputStream(os);
+        try{
+            this.mSocket = new Socket(mServerIpAddress, mPort);
+            OutputStream os = this.mSocket.getOutputStream();
+            mOutputStream = new BufferedOutputStream(os);
+        }catch (Exception e){
+            Log.e(TAG, e.toString());
+        }
     }
 
     @Override

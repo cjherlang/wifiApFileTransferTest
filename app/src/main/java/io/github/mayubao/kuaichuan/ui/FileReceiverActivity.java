@@ -27,10 +27,10 @@ import io.github.mayubao.kuaichuan.R;
 import io.github.mayubao.kuaichuan.common.BaseActivity;
 import io.github.mayubao.kuaichuan.core.BaseTransfer;
 import io.github.mayubao.kuaichuan.core.FileReceiver;
+import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.entity.IpPortInfo;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
-import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.utils.ToastUtils;
 import io.github.mayubao.kuaichuan.ui.adapter.FileReceiverAdapter;
 
@@ -280,7 +280,9 @@ public class FileReceiverActivity extends BaseActivity {
         public void run() {
             Log.i(TAG, "------>>>Socket已经开启");
             try {
-                serverSocket = new ServerSocket(Constant.DEFAULT_SERVER_PORT);
+                serverSocket = new ServerSocket();
+                serverSocket.setReuseAddress(true);
+                serverSocket.bind(new InetSocketAddress(Constant.DEFAULT_SERVER_PORT));
                 mHandler.obtainMessage(MSG_FILE_RECEIVER_INIT_SUCCESS).sendToTarget();
                 while (!Thread.currentThread().isInterrupted()){
                     Socket socket = serverSocket.accept();

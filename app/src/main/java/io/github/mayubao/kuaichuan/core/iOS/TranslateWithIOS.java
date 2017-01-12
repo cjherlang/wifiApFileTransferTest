@@ -47,11 +47,13 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
     boolean mIsSendFile = false;
 
     String mIOSServerIp = "";
+    String mClientIp = "";
 
     /**
      * 与 ios 通信的 线程
      */
     Runnable mUdpServerRuannable;
+
     public static final int MSG_TO_START_SEND_TO_IOS = 0X89;
     public static final int MSG_TO_START_IOS_RECEIVE_SERVER = 0X90;
     public static final int MSG_TO_RECEIVE_BROADCAST = 0X91;
@@ -68,7 +70,9 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             }else if(msg.what == MSG_TO_START_IOS_RECEIVE_SERVER){
                 //(Todo:jhchen)启动接收文件服务器
                 Log.i(TAG, "go to send start ios receiver server ######>>>" + MSG_TO_START_IOS_RECEIVE_SERVER);
-                startActivity(new Intent(mContext, IOSFileReceiverActivity.class));
+                Intent intent = new Intent(mContext, IOSFileReceiverActivity.class);
+                intent.putExtra("clientIp", mClientIp);
+                startActivity(intent);
                 finishNormal();
             }else if (msg.what == MSG_TO_RECEIVE_BROADCAST){
                 //broadcast test
@@ -99,26 +103,6 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
         tv_top_tip = (TextView) findViewById(R.id.tv_top_tip);
     }
 
-    void androidTest(){
-        TextView client = (TextView) findViewById(R.id.translate_to_ios_client);
-        TextView server = (TextView) findViewById(R.id.translate_to_ios_server);
-        client.setVisibility(View.VISIBLE);
-        server.setVisibility(View.VISIBLE);
-        client.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mIOSServerIp = "192.168.43.1";
-                mHandler.obtainMessage(MSG_TO_START_SEND_TO_IOS).sendToTarget();
-            }
-        });
-        server.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mHandler.obtainMessage(MSG_TO_START_IOS_RECEIVE_SERVER).sendToTarget();
-            }
-        });
-    }
-
     void getBaseData(){
         Bundle bundle = getIntent().getExtras();
         mIsSendFile = bundle.getBoolean("isSend");
@@ -135,9 +119,9 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             public void onWifiApEnabled() {
                 Log.i(TAG, "======>>>onWifiApEnabled !!!");
                 if(!mIsInitialized){
-                    mUdpServerRuannable = createUDPServerRunnable();
-                    AppContext.MAIN_EXECUTOR.execute(mUdpServerRuannable);
-
+                    //(Todo:jhchen) 开启udp通信服务
+//                    mUdpServerRuannable = createUDPServerRunnable();
+//                    AppContext.MAIN_EXECUTOR.execute(mUdpServerRuannable);
                     mIsInitialized = true;
                     tv_desc.setText(getResources().getString(R.string.tip_now_init_is_finish));
                     tv_desc.postDelayed(new Runnable() {
@@ -235,17 +219,17 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
                     new MyWifiManager.UdpSendPacket(mDatagramSocket, sendData, ipAddress, port).start();
                 } else {
                     //接收文件，通知ios已经初始化完毕
-                    sendData = Constant.MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS.getBytes(BaseTransfer.UTF_8);
-                    new MyWifiManager.UdpSendPacket(mDatagramSocket, sendData, ipAddress, port).start();
+                    mClientIp = ipAddress.toString();
+                    mClientIp = mClientIp.substring(mClientIp.lastIndexOf("/") + 1);
                     //(Todo:jhchen)启动接收文件服务器
                     mHandler.obtainMessage(MSG_TO_START_IOS_RECEIVE_SERVER).sendToTarget();
                 }
             }else if (msg != null && msg.startsWith(Constant.MSG_IOS_ON_SERVER_INIT_SUCCESS)){
                 //发送文件，接收ios通知初始化完毕，可以直接开始发送文件
-                Log.i(TAG, "Get the msg from ios######>>>" + Constant.MSG_IOS_ON_SERVER_INIT_SUCCESS);
                 //(Todo:jhchen) 开始发送文件
                 mIOSServerIp = ipAddress.toString();
                 mIOSServerIp = mIOSServerIp.substring(mIOSServerIp.lastIndexOf("/") + 1);
+                Log.i(TAG, "Get the msg from ios######>>>" + Constant.MSG_IOS_ON_SERVER_INIT_SUCCESS + mIOSServerIp);
                 mHandler.obtainMessage(MSG_TO_START_SEND_TO_IOS).sendToTarget();
             } else {
                 //broadcast test
@@ -262,6 +246,71 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             mDatagramSocket.disconnect();
             mDatagramSocket.close();
             mDatagramSocket = null;
+        }
+    }
+
+    /**
+     * android间测试与ios的通信
+     */
+    void androidTest(){
+        TextView client = (TextView) findViewById(R.id.translate_to_ios_client);
+        TextView server = (TextView) findViewById(R.id.translate_to_ios_server);
+        client.setVisibility(View.VISIBLE);
+        server.setVisibility(View.VISIBLE);
+        client.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mUdpServerRuannable = createUDPServerRunnable();
+                AppContext.MAIN_EXECUTOR.execute(mUdpServerRuannable);
+            }
+        });
+
+        server.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new IOSTestThread().start();
+                new MyWifiManager.UdpBroadCast(Constant.MSG_IOS_ON_CONNECTED).start();
+            }
+        });
+    }
+
+    class IOSTestThread extends Thread{
+        @Override
+        public void run() {
+            try{
+                byte[] sendData = null;
+                mDatagramSocket = new DatagramSocket(null);
+                mDatagramSocket.setReuseAddress(true);
+                mDatagramSocket.bind(new InetSocketAddress(Constant.DEFAULT_SERVER_COM_PORT));
+                byte[] receiveData = new byte[1024];
+                while(true) {
+                    DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                    mDatagramSocket.receive(receivePacket);
+                    String msg = new String( receivePacket.getData()).trim();
+                    InetAddress ipAddress = receivePacket.getAddress();
+                    int udpPort = receivePacket.getPort(); //端口号取到不对应，有待调查，目前先写死
+                    int port = Constant.DEFAULT_SERVER_COM_PORT;
+                    if(msg != null && msg.startsWith(Constant.MSG_IOS_ON_SERVER_INIT)){
+                        //开始接收文件
+                        Log.i(TAG, "Get the msg from android######>>>" + Constant.MSG_IOS_ON_SERVER_INIT);
+                        mClientIp = ipAddress.toString();
+                        mClientIp = mClientIp.substring(mClientIp.lastIndexOf("/") + 1);
+                        mHandler.obtainMessage(MSG_TO_START_IOS_RECEIVE_SERVER).sendToTarget();
+                    }else if (msg != null && msg.startsWith(Constant.MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS)){
+                        //发送文件，接收ios通知初始化完毕，可以直接开始发送文件
+                        Log.i(TAG, "Get the msg from android######>>>" + Constant.MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS);
+                        //(Todo:jhchen) 开始发送文件
+                        mIOSServerIp = ipAddress.toString();
+                        mIOSServerIp = mIOSServerIp.substring(mIOSServerIp.lastIndexOf("/") + 1);
+                        mHandler.obtainMessage(MSG_TO_START_SEND_TO_IOS).sendToTarget();
+                    } else {
+                        //broadcast test
+                        //mHandler.obtainMessage(MSG_TO_RECEIVE_BROADCAST).sendToTarget();
+                    }
+                }
+            }catch (Exception e){
+                System.out.println(e.toString());
+            }
         }
     }
 }

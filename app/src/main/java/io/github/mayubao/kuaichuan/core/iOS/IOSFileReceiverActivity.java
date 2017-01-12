@@ -14,12 +14,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import io.github.mayubao.kuaichuan.AppContext;
 import io.github.mayubao.kuaichuan.Constant;
 import io.github.mayubao.kuaichuan.R;
+import io.github.mayubao.kuaichuan.core.BaseTransfer;
 import io.github.mayubao.kuaichuan.core.MyWifiManager;
 import io.github.mayubao.kuaichuan.core.entity.FileInfo;
 import io.github.mayubao.kuaichuan.core.utils.FileUtils;
@@ -62,6 +67,9 @@ public class IOSFileReceiverActivity extends AppCompatActivity implements View.O
     FileInfo mCurFileInfo;
     IOSServerRunnable mReceiverServer;
 
+    String mClientIp;
+
+    public static final int MSG_FILE_RECEIVER_INIT_SUCCESS = 0X4444;
     public static final int MSG_ADD_FILE_INFO = 0X5555;
     public static final int MSG_UPDATE_FILE_INFO = 0X6666;
     Handler mHandler = new Handler(){
@@ -76,6 +84,8 @@ public class IOSFileReceiverActivity extends AppCompatActivity implements View.O
                 //ADD FileInfo 到 Adapter
                 updateTotalProgressView();
                 if(mFileReceiverAdapter != null) mFileReceiverAdapter.update();
+            } else if(msg.what == MSG_FILE_RECEIVER_INIT_SUCCESS){
+                new NotifyInitServerSuccess(mClientIp).start();
             }
         }
     };
@@ -86,8 +96,14 @@ public class IOSFileReceiverActivity extends AppCompatActivity implements View.O
         mContext = this;
         setContentView(R.layout.activity_file_receiver);
         findViewById();
+        getBaseData();
         init();
         startServer();
+    }
+
+    public void getBaseData(){
+        Bundle bundle = getIntent().getExtras();
+        mClientIp = bundle.getString("clientIp");
     }
 
     public void findViewById(){
@@ -192,10 +208,12 @@ public class IOSFileReceiverActivity extends AppCompatActivity implements View.O
         public void run() {
             Log.i(TAG, "------>>>Socket已经开启");
             try {
-                serverSocket = new ServerSocket(Constant.DEFAULT_SERVER_PORT);
+                serverSocket = new ServerSocket();
+                serverSocket.setReuseAddress(true);
+                serverSocket.bind(new InetSocketAddress(Constant.DEFAULT_SERVER_PORT));
+                mHandler.obtainMessage(MSG_FILE_RECEIVER_INIT_SUCCESS).sendToTarget();
                 while (!Thread.currentThread().isInterrupted()){
                     Socket socket = serverSocket.accept();
-
                     IOSFileReceiver fileReceiver = new IOSFileReceiver(socket);
                     fileReceiver.setOniOSFileReceiveListener(new IOSFileReceiver.OniOSFileReceiveListener() {
                         @Override
@@ -276,9 +294,54 @@ public class IOSFileReceiverActivity extends AppCompatActivity implements View.O
                 try {
                     serverSocket.close();
                     serverSocket = null;
+                    closeSocket();
                 } catch (IOException e) {
                 }
             }
+        }
+    }
+
+    DatagramSocket mDatagramSocket;
+    class NotifyInitServerSuccess extends Thread{
+        String clientIp = "";
+
+        public NotifyInitServerSuccess(String clientIp) {
+            this.clientIp = clientIp;
+        }
+
+        @Override
+        public void run() {
+            try{
+                mDatagramSocket = new DatagramSocket(null);
+                mDatagramSocket.setReuseAddress(true);
+                mDatagramSocket.bind(new InetSocketAddress(Constant.DEFAULT_SERVER_COM_PORT));
+
+                byte[] receiveData = new byte[1024];
+                byte[] sendData = null;
+
+                //1.发送 文件接收方 初始化
+                //接收文件，通知ios已经初始化完毕
+                InetAddress ipAddress = InetAddress.getByName(clientIp);
+                sendData = Constant.MSG_IOS_ON_SERVER_INIT_SUCCESS.getBytes(BaseTransfer.UTF_8);
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, ipAddress, Constant.DEFAULT_SERVER_COM_PORT);
+                mDatagramSocket.send(sendPacket);
+                Log.i(TAG, "Send Msg To FileSender######>>>" + Constant.MSG_FILE_RECEIVER_INIT_SUCCESS);
+                Log.i(TAG, "sendFileReceiverInitSuccessMsgToFileSender------>>>end");
+                closeSocket();
+            }catch (Exception e){
+
+            }
+        }
+    }
+
+    /**
+     * 关闭UDP Socket 流
+     */
+    private void closeSocket(){
+        if(mDatagramSocket != null){
+            mDatagramSocket.disconnect();
+            mDatagramSocket.close();
+            mDatagramSocket = null;
         }
     }
 }

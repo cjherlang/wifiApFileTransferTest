@@ -136,7 +136,7 @@ public class FileSenderActivity extends BaseActivity implements View.OnClickList
     public void findViewById(){
         tv_back = (TextView) findViewById(R.id.tv_back);
         tv_back.setOnClickListener(this);
-        tv_title = (TextView) findViewById(R.id.tv_back);
+        tv_title = (TextView) findViewById(R.id.tv_title);
         pb_total = (ProgressBar) findViewById(R.id.pb_total);
         tv_value_storage = (TextView) findViewById(R.id.tv_value_storage);
         tv_unit_storage = (TextView) findViewById(R.id.tv_unit_storage);
