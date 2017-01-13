@@ -125,8 +125,6 @@ public class IOSFileSender extends BaseTransfer implements Runnable {
             MLog.i(TAG, "FileSender finish() --->>> occur expection");
             if(mOnSendListener != null) mOnSendListener.onFailure(e, mFileInfo);
         }
-
-
     }
 
     @Override
@@ -169,6 +167,10 @@ public class IOSFileSender extends BaseTransfer implements Runnable {
         //写入文件
         long fileSize = mFileInfo.getSize();
         InputStream fis = new FileInputStream(new File(mFileInfo.getFilePath()));
+
+        //这个打印特别占性能，如果文件过大，可能导致下面无法进行
+//        String b1 = FileUtils.File2HexString(mFileInfo.getFilePath(), mFileInfo.getSize());
+//        MLog.i(TAG, "file:\n" + b1);
 
         //记录文件开始写入时间
         long startTime = System.currentTimeMillis();

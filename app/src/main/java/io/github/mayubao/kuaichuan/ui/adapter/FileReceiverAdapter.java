@@ -160,6 +160,8 @@ public class FileReceiverAdapter extends BaseAdapter {
                             FileUtils.openFile(mContext, FileUtils.getLocalFilePath(fileInfo.getFilePath()));
                         }
                     });
+                } else {
+                    viewHolder.btn_operation.setText("完成");
                 }
 
             }else if(fileInfo.getResult() == FileInfo.FLAG_FAILURE) { //文件传输失败

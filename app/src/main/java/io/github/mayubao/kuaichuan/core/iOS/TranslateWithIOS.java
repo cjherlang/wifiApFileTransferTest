@@ -89,7 +89,7 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
         getBaseData();
         findViewById();
         init();
-        androidTest();
+        //androidTest();
     }
 
     void findViewById(){
@@ -119,9 +119,9 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             public void onWifiApEnabled() {
                 Log.i(TAG, "======>>>onWifiApEnabled !!!");
                 if(!mIsInitialized){
-                    //(Todo:jhchen) 开启udp通信服务
-//                    mUdpServerRuannable = createUDPServerRunnable();
-//                    AppContext.MAIN_EXECUTOR.execute(mUdpServerRuannable);
+                    //(Todo:jhchen) 开启udp通信服务，如果是用android模拟ios，那么此处需要注释掉，利用点击启动
+                    mUdpServerRuannable = createUDPServerRunnable();
+                    AppContext.MAIN_EXECUTOR.execute(mUdpServerRuannable);
                     mIsInitialized = true;
                     tv_desc.setText(getResources().getString(R.string.tip_now_init_is_finish));
                     tv_desc.postDelayed(new Runnable() {
@@ -209,7 +209,7 @@ public class TranslateWithIOS extends AppCompatActivity implements View.OnClickL
             mDatagramSocket.receive(receivePacket);
             String msg = new String( receivePacket.getData()).trim();
             InetAddress ipAddress = receivePacket.getAddress();
-            int udpPort = receivePacket.getPort(); //端口号取到不对应，有待调查，目前先写死
+            int udpPort = receivePacket.getPort(); //端口号取到不对应，有待调查，目前先写死成ios端定义的端口号
             int port = Constant.DEFAULT_SERVER_COM_PORT;
             if(msg != null && msg.startsWith(Constant.MSG_IOS_ON_CONNECTED)){
                 Log.i(TAG, "Get the msg from ios ###### connected>>>" + Constant.MSG_IOS_ON_CONNECTED);

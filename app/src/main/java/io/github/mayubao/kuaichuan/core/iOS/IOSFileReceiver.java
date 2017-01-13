@@ -133,15 +133,13 @@ public class IOSFileReceiver extends BaseTransfer implements Runnable {
             }
         }
         MLog.i(TAG, "FileReceiver receive header size------>>>" + headTotal);
-        MLog.i(TAG, "FileReceiver receive header------>>>" + new String(headerBytes, UTF_8));
+        MLog.i(TAG, "FileReceiver receive header------>>>" + new String(headerBytes, UTF_8).trim());
 
 
         //解析header
         String jsonStr = new String(headerBytes, UTF_8);
         mFileInfo = FileInfo.toObjectWithoutType(jsonStr);
         if(mOnReceiveListener != null) mOnReceiveListener.onGetFileInfo(mFileInfo);
-//        String fileName = getFileName(fileInfo.getFilePath());
-//        int fileSize = fileInfo.getSize();
         MLog.i(TAG, "parseHeader######>>>end");
     }
 
@@ -178,6 +176,9 @@ public class IOSFileReceiver extends BaseTransfer implements Runnable {
                 if(eTime - sTime > 200) { //大于500ms 才进行一次监听
                     sTime = eTime;
                     if(mOnReceiveListener != null) mOnReceiveListener.onProgress(total, fileSize);
+                }
+                if (total == fileSize){
+                    break;
                 }
             }
         }

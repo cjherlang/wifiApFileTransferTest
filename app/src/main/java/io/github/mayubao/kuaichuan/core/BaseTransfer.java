@@ -15,7 +15,7 @@ public abstract class BaseTransfer implements Transferable{
     /**
      * 字节数组长度
      */
-    public static final int BYTE_SIZE_HEADER    = 1024 * 10;
+    public static final int BYTE_SIZE_HEADER    = 1024;
     public static final int BYTE_SIZE_SCREENSHOT    = 1024 * 40;
     public static final int BYTE_SIZE_DATA      = 1024 * 4;
 

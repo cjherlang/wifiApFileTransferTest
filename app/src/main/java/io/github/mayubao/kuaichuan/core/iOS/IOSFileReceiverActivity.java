@@ -277,8 +277,6 @@ public class IOSFileReceiverActivity extends AppCompatActivity implements View.O
                         }
                     });
 
-//                    mFileReceiver = fileReceiver;
-//                    new Thread(fileReceiver).start();
                     AppContext.getAppContext().MAIN_EXECUTOR.execute(fileReceiver);
                 }
             } catch (IOException e) {
@@ -322,7 +320,9 @@ public class IOSFileReceiverActivity extends AppCompatActivity implements View.O
                 //1.发送 文件接收方 初始化
                 //接收文件，通知ios已经初始化完毕
                 InetAddress ipAddress = InetAddress.getByName(clientIp);
-                sendData = Constant.MSG_IOS_ON_SERVER_INIT_SUCCESS.getBytes(BaseTransfer.UTF_8);
+                //android 模拟ios的时候需要发送该action
+                //sendData = Constant.MSG_IOS_ON_SERVER_INIT_SUCCESS.getBytes(BaseTransfer.UTF_8);
+                sendData = Constant.MSG_NOTIFY_IOS_ON_SERVER_INIT_SUCCESS.getBytes(BaseTransfer.UTF_8);
                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, ipAddress, Constant.DEFAULT_SERVER_COM_PORT);
                 mDatagramSocket.send(sendPacket);
                 Log.i(TAG, "Send Msg To FileSender######>>>" + Constant.MSG_FILE_RECEIVER_INIT_SUCCESS);

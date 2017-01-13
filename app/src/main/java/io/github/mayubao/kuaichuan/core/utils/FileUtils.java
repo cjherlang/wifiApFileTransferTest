@@ -249,7 +249,7 @@ public class FileUtils {
 
         if(fileName.lastIndexOf(FileInfo.EXTEND_APK) > 0){
             dirPath = getSpecifyDirPath(FileInfo.TYPE_APK);
-        }else if(fileName.lastIndexOf(FileInfo.EXTEND_JPG) > 0){
+        }else if(fileName.lastIndexOf(FileInfo.EXTEND_JPG) > 0 || fileName.lastIndexOf(FileInfo.EXTEND_PNG) > 0 || fileName.lastIndexOf(FileInfo.EXTEND_JPEG) > 0){
             dirPath = getSpecifyDirPath(FileInfo.TYPE_JPG);
         }else if(fileName.lastIndexOf(FileInfo.EXTEND_MP3) > 0){
             dirPath = getSpecifyDirPath(FileInfo.TYPE_MP3);
@@ -401,7 +401,7 @@ public class FileUtils {
         if(filePath == null || filePath.equals("")){
             return false;
         }
-        if(filePath.lastIndexOf(FileInfo.EXTEND_JPG) > 0 || filePath.lastIndexOf(FileInfo.EXTEND_JPEG) > 0){
+        if(filePath.lastIndexOf(FileInfo.EXTEND_JPG) > 0 || filePath.lastIndexOf(FileInfo.EXTEND_JPEG) > 0 || filePath.lastIndexOf(FileInfo.EXTEND_PNG) > 0){
             return true;
         }
         return false;
@@ -935,6 +935,37 @@ public class FileUtils {
 
         System.out.println("Test getTimeByArrayStr(59 * 1000)----->>>" + getTimeByArrayStr(59 * 1000*100)[0]
                 + " , " + getTimeByArrayStr(59 * 1000 *100)[1]);
+    }
+
+    static public String File2HexString(String path, long size) throws Exception
+    {
+        FileInputStream fin = new FileInputStream(new File(path));
+        byte[] bytes  = new byte[(int)size];
+        //将文件内容写入字节数组，提供测试的case
+        fin.read(bytes);
+
+        fin.close();
+
+        return byte2hex(bytes);
+    }
+
+    static public String byte2hex(byte [] buffer){
+        String h = "";
+
+        int num = 1;
+        for(int i = 0; i < buffer.length; i++){
+            String temp = Integer.toHexString(buffer[i] & 0xFF);
+            if(temp.length() == 1){
+                temp = "0" + temp;
+            }
+            h = h + " "+ temp;
+            if (num == 100){
+                h = h + "\n";
+                num = 1;
+            }
+            num ++;
+        }
+        return h;
     }
 
 }
